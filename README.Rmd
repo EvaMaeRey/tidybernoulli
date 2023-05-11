@@ -1,0 +1,88 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# tidybernoulli
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of tidybernoulli is to ...
+
+## Installation
+
+You can install the development version of tidybernoulli from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("EvaMaeRey/tidybernoulli")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+library(tidybernoulli)
+## basic example code
+```
+
+
+```{r cars}
+bernoulli_trial()
+
+trial_init() |>
+  trial_advance()
+
+
+trial_init() |>
+  trial_advance() |>
+  trial_advance() 
+```
+
+```{r}
+library(magrittr)
+trial_init(prob = .3) %>%
+  trial_advance() %>%
+  trial_advance() %>%
+  .$out %>%
+  sum_across() %>%
+  prod_across()
+```
+
+
+
+```{r}
+library(magrittr)
+bernoulli_trial(prob = .5) %>%
+  add_trials() %>%
+  add_trials() %>%
+  add_trials(5) %>%
+  .$out %>%
+  sum_across() %>%
+  prod_across()
+```
+
+```{r}
+library(dplyr)
+bernoulli_trial(prob = .5) %>%
+  add_trials() %>%
+  add_trials() %>%
+  add_trials(5) %>%
+  .$out %>%
+  sum_across() %>%
+  prod_across() %>%
+  group_by(global_outcome) %>%
+  summarize(probs = sum(global_probs))
+```
