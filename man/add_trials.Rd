@@ -13,10 +13,8 @@ add_trials(trials, increment = 1)
 Title
 }
 \examples{
-
 bernoulli_trial() |>
 trial_init() |>
   add_trials() |>
   add_trials()
-
 }

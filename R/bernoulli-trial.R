@@ -8,10 +8,106 @@
 #' @examples
 #' bernoulli_trial(.5)
 #' bernoulli_trial(.6)
-bernoulli_trial <- function(prob = .25){
+bernoulli_trial <- function(outcome_type = "num", outcome_set = c(0, 1), prob = .25){
 
-  data.frame(outcome = 0:1, prob = c(1-prob, prob))
+  if(outcome_type == "char"){
+    data <- data.frame(outcome = outcome_set, prob = c(1-prob, prob))
+  }
 
+  if(outcome_type == "num"){
+    data <- data.frame(outcome = 0:1, prob = c(1-prob, prob))
+  }
+
+  if(outcome_type == "logical"){
+    data <- data.frame(outcome = c(FALSE, TRUE), prob = c(1-prob, prob))
+  }
+
+  data
+
+}
+
+
+
+
+
+
+
+
+
+
+#' Title
+#'
+#' @param prob probability of success, default is .25
+#'
+#' @return probability and outcome as 0 and 1
+#' @export
+#'
+#' @examples
+#' weighted_coin()
+#' weighted_coin(prob = .55)
+#' weighted_coin(outcome_type = "num")
+#' weighted_coin(outcome_type = "logical")
+#' weighted_coin(outcome_set = c("fish", "no fish"))
+weighted_coin <- function(prob = .75, outcome_type = "char", outcome_set = c("tails","heads")){
+
+  bernoulli_trial(outcome_type = outcome_type, outcome_set = outcome_set, prob = prob)
+
+}
+
+
+#' Title
+#'
+#' @param prob probability of success, default is .25
+#'
+#' @return probability and outcome as 0 and 1
+#' @export
+#'
+#' @examples
+#' fair_coin()
+#' fair_coin(outcome_type = "num")
+#' fair_coin(outcome_type = "logical")
+#' fair_coin(outcome_set = c("fish", "no fish"))
+fair_coin <- function(outcome_type = "char", outcome_set = c("tails","heads")){
+
+  # same as weighted but only prob point five allowed
+  bernoulli_trial(outcome_type = outcome_type, outcome_set = outcome_set, prob = .5)
+
+}
+
+
+#' Title
+#'
+#' @param back_story
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
+#' prize_wheel()
+#' prize_wheel(back_story = FALSE)
+#'
+#' prize_wheel() |>
+#'  trial_init() |>
+#'  trial_advance()
+#'
+#' prize_wheel(back_story = FALSE) |>
+#'  trial_init() |>
+#'  trial_advance()
+#'
+prize_wheel <- function(back_story = TRUE){
+
+  if(back_story){
+
+  data <- data.frame(outcome = c("$0", "$1", "$3"), prob = c("9 of 12 slices", "2 of 12 slices", "1 of 12 slice"))
+
+  }else{
+
+  data <- data.frame(outcome = c(0, 1, 3), prob = c(9/12, 2/12, 1/12))
+
+  }
+
+  data
 }
 
 #' Title
@@ -215,7 +311,6 @@ sum_across <- function(data, var_key = "outcome"){
                 global_outcome =
                   rowSums(dplyr::across(dplyr::contains(var_key)))) |>
     dplyr::select(global_outcome, dplyr::everything())
-
 
 }
 
