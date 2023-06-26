@@ -96,7 +96,6 @@ trial_init() |>
 #> 3          1    0.25          0    0.75
 #> 4          1    0.25          1    0.25
 
-
 trial_init() |>
   trial_advance() |>
   trial_advance() 
@@ -207,39 +206,139 @@ dbinom(x =  0:7, size = 7, prob = .5)
 #> [8] 0.0078125
 ```
 
+-----
+
+# drob quick job on veridical paradox
+
+> A \#tidyverse simulation to demonstrate that if you wait for two heads
+> in a row, it takes 6 flips on average, while you wait for a heads then
+> a tails, it takes 4 flips on average
+
+``` r
+library(tidyverse)
+#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+#> ✔ forcats   1.0.0     ✔ readr     2.1.4
+#> ✔ ggplot2   3.4.1     ✔ stringr   1.5.0
+#> ✔ lubridate 1.9.2     ✔ tibble    3.2.0
+#> ✔ purrr     1.0.1     ✔ tidyr     1.3.0
+#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+#> ✖ tidyr::extract()   masks magrittr::extract()
+#> ✖ dplyr::filter()    masks stats::filter()
+#> ✖ dplyr::lag()       masks stats::lag()
+#> ✖ purrr::set_names() masks magrittr::set_names()
+#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+crossing(trial = 1:1000,
+         flip = 1:100) %>% 
+  mutate(heads = rbinom(n(), 1, .5)) %>% 
+  group_by(trial) %>% 
+  mutate(next_flip = lead(heads),
+         hh = heads & next_flip,
+         ht = heads & !next_flip) %>% 
+  summarise(first_hh = which(hh)[1] + 1, 
+            first_ht = which(ht)[1] + 1) %>% 
+  summarise(first_hh = mean(first_hh),
+            first_ht = mean(first_ht))
+#> # A tibble: 1 × 2
+#>   first_hh first_ht
+#>      <dbl>    <dbl>
+#> 1     6.10     3.97
+```
+
+It’s about the second chances…
+
+``` r
+options(pillar.print_max = Inf)
+fair_coin(outcome_set = c("T", "H")) %>% 
+  select(-prob) %>% 
+  add_trials() %>% 
+  add_trials() %>% 
+  add_trials() %>%
+  add_trials() %>%
+  add_trials() %>%
+  add_trials() %>% 
+  .$out %>% 
+  mutate(history = row_number()) %>% 
+  pivot_longer(-history) %>% 
+  group_by(history) %>% 
+  ggplot() + 
+  aes(y = history, x = name) + 
+  geom_tile(color = "white") + 
+  aes(fill = value) ->
+baseplot; baseplot
+```
+
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+
+``` r
+
+baseplot + 
+  geom_point(data = . %>% filter( value == "H" & lag(value) == "H"), color = "darkred") 
+```
+
+<img src="man/figures/README-unnamed-chunk-10-2.png" width="100%" />
+
+``` r
+
+baseplot + 
+  geom_point(data = . %>% filter( value == "T" & lag(value) == "H"), color = "darkred")
+```
+
+<img src="man/figures/README-unnamed-chunk-10-3.png" width="100%" />
+
 # Peek into internals of tidybernoulli
 
 ``` r
-readLines("R/bernoulli-trial.R")[150:180]
-#>  [1] "#"                                                                                  
-#>  [2] "# my_trials"                                                                        
-#>  [3] "#"                                                                                  
-#>  [4] "# my_trials$init(trial = bernoulli_trial())"                                        
-#>  [5] "# my_trials$out"                                                                    
-#>  [6] "# my_trials$update()"                                                               
-#>  [7] "# my_trials$out"                                                                    
-#>  [8] ""                                                                                   
-#>  [9] "Trials <- R6::R6Class(\"Trials\","                                                  
-#> [10] "                  public = list("                                                   
-#> [11] ""                                                                                   
-#> [12] "                    # objects"                                                      
-#> [13] "                    trial = NULL,"                                                  
-#> [14] "                    index = NULL,"                                                  
-#> [15] "                    out = NULL,"                                                    
-#> [16] ""                                                                                   
-#> [17] ""                                                                                   
-#> [18] "                    # functions"                                                    
-#> [19] "                    init = function(trial = NULL){"                                 
-#> [20] ""                                                                                   
-#> [21] "                      self$trial <- trial"                                          
-#> [22] "                      self$index <- 1"                                              
-#> [23] ""                                                                                   
-#> [24] "                      self$out <- cross_trials(self$trial, num_trials = self$index)"
-#> [25] ""                                                                                   
-#> [26] "                      invisible(self)          #returns"                            
-#> [27] ""                                                                                   
-#> [28] ""                                                                                   
-#> [29] "                    },"                                                             
-#> [30] ""                                                                                   
-#> [31] "                    update = function(increment = 1){ # a method"
+readLines("R/bernoulli-trial.R")[150:200]
+#>  [1] "#"                                                                                       
+#>  [2] "# my_trials"                                                                             
+#>  [3] "#"                                                                                       
+#>  [4] "# my_trials$init(trial = bernoulli_trial())"                                             
+#>  [5] "# my_trials$out"                                                                         
+#>  [6] "# my_trials$update()"                                                                    
+#>  [7] "# my_trials$out"                                                                         
+#>  [8] ""                                                                                        
+#>  [9] "Trials <- R6::R6Class(\"Trials\","                                                       
+#> [10] "                  public = list("                                                        
+#> [11] ""                                                                                        
+#> [12] "                    # objects"                                                           
+#> [13] "                    trial = NULL,"                                                       
+#> [14] "                    index = NULL,"                                                       
+#> [15] "                    out = NULL,"                                                         
+#> [16] ""                                                                                        
+#> [17] ""                                                                                        
+#> [18] "                    # functions"                                                         
+#> [19] "                    init = function(trial = NULL){"                                      
+#> [20] ""                                                                                        
+#> [21] "                      self$trial <- trial"                                               
+#> [22] "                      self$index <- 1"                                                   
+#> [23] ""                                                                                        
+#> [24] "                      self$out <- cross_trials(self$trial, num_trials = self$index)"     
+#> [25] ""                                                                                        
+#> [26] "                      invisible(self)          #returns"                                 
+#> [27] ""                                                                                        
+#> [28] ""                                                                                        
+#> [29] "                    },"                                                                  
+#> [30] ""                                                                                        
+#> [31] "                    update = function(increment = 1){ # a method"                        
+#> [32] ""                                                                                        
+#> [33] "                      self$index <- self$index + increment"                              
+#> [34] ""                                                                                        
+#> [35] "                      # displaying"                                                      
+#> [36] "                      self$out <- cross_trials(self$trial, num_trials = self$index)"     
+#> [37] ""                                                                                        
+#> [38] "                      invisible(self)          #returns"                                 
+#> [39] ""                                                                                        
+#> [40] "                    },"                                                                  
+#> [41] ""                                                                                        
+#> [42] "                    print = function() {  # print method; default is to print everything"
+#> [43] ""                                                                                        
+#> [44] "                      print(self$out)"                                                   
+#> [45] ""                                                                                        
+#> [46] "                    }"                                                                   
+#> [47] "                  )"                                                                     
+#> [48] ")"                                                                                       
+#> [49] ""                                                                                        
+#> [50] ""                                                                                        
+#> [51] ""
 ```
