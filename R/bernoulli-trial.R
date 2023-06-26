@@ -275,17 +275,29 @@ trial_advance <- function(trials, increment = 1){
 #' trial_init() |>
 #'   add_trials() |>
 #'   add_trials()
+#'
+#'   bernoulli_trial() |>
+#'   add_trials()
+#'
+#'  fair_coin() |>
+#'   add_trials(2)
 add_trials <- function(trials, increment = 1){
 
+  if(!R6::is.R6(trials)){
 
-  if(!R6::is.R6(trials)){my_trials <- trial_init(trial = trials)
+    my_trials <- trial_init(trial = trials)
 
-  my_trials <- trial_advance(trials = my_trials,
-                             increment = increment -1)
+    my_trials <- trial_advance(trials = my_trials,
+                              increment = increment)
 
   }
-  if(R6::is.R6(trials)){my_trials <- trial_advance(trials = trials,
-                                               increment = increment)}
+
+  if(R6::is.R6(trials)){
+
+    my_trials <- trial_advance(trials = trials,
+                               increment = increment)
+
+    }
 
   my_trials
 

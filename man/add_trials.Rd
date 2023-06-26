@@ -17,4 +17,10 @@ bernoulli_trial() |>
 trial_init() |>
   add_trials() |>
   add_trials()
+
+  bernoulli_trial() |>
+  add_trials()
+
+ fair_coin() |>
+  add_trials(2)
 }

@@ -26,6 +26,8 @@ Instead of looking at the realization of single trials and trials histories, we 
 
 Once all the outcome-probability pathways have been built up, summary functions allow us to ask questions about global outcomes; e.g. how likely are we to observe at least one success in 5 fair coin flips. Students will be able to see distributions like the binomial distribution emerge from first principles.  
 
+tidybernoulli was inspired and is complementary to [ma206distributions](https://evamaerey.github.io/ma206distributions/) which treats common discrete probability distributions consistent with data requirements for use in with ggplot2 and the rest of the tidyverse.
+
 ## Installation
 
 You can install the development version of tidybernoulli from [GitHub](https://github.com/) with:
@@ -70,11 +72,11 @@ This is a basic example which shows you how to solve a common problem:
 bernoulli_trial()
 
 trial_init() |>
-  trial_advance()
+  add_trials()
 
 trial_init() |>
-  trial_advance() |>
-  trial_advance() 
+  add_trials() |>
+  add_trials() 
 ```
 
 
@@ -83,8 +85,8 @@ trial_init() |>
 ```{r}
 library(magrittr)
 trial_init(prob = .3) %>%
-  trial_advance() %>%
-  trial_advance() %>%
+  add_trials() %>%
+  add_trials() %>%
   .$out %>%
   sum_across() %>%
   prod_across()
@@ -95,6 +97,7 @@ trial_init(prob = .3) %>%
 ```{r}
 library(magrittr)
 bernoulli_trial(prob = .5) %>%
+  trial_init() %>% 
   add_trials() %>%
   add_trials() %>%
   add_trials(5) %>%
@@ -108,9 +111,10 @@ bernoulli_trial(prob = .5) %>%
 ```{r}
 library(dplyr)
 bernoulli_trial(prob = .5) %>%
+  add_trials() %>% 
   add_trials() %>%
   add_trials() %>%
-  add_trials(5) %>%
+  add_trials(3) %>%
   .$out %>%
   sum_across() %>%
   prod_across() %>%
@@ -156,12 +160,12 @@ It's about the second chances...
 options(pillar.print_max = Inf)
 fair_coin(outcome_set = c("T", "H")) %>% 
   select(-prob) %>% 
+  trial_init() %>% 
   add_trials() %>% 
   add_trials() %>% 
   add_trials() %>%
   add_trials() %>%
   add_trials() %>%
-  add_trials() %>% 
   .$out %>% 
   mutate(history = row_number()) %>% 
   pivot_longer(-history) %>% 

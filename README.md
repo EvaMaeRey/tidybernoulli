@@ -27,6 +27,11 @@ likely are we to observe at least one success in 5 fair coin flips.
 Students will be able to see distributions like the binomial
 distribution emerge from first principles.
 
+tidybernoulli was inspired and is complementary to
+[ma206distributions](https://evamaerey.github.io/ma206distributions/)
+which treats common discrete probability distributions consistent with
+data requirements for use in with ggplot2 and the rest of the tidyverse.
+
 ## Installation
 
 You can install the development version of tidybernoulli from
@@ -87,7 +92,7 @@ bernoulli_trial()
 #> 2       1 0.25
 
 trial_init() |>
-  trial_advance()
+  add_trials()
 #> # A tibble: 4 × 4
 #>   t1_outcome t1_prob t2_outcome t2_prob
 #>        <int>   <dbl>      <int>   <dbl>
@@ -97,8 +102,8 @@ trial_init() |>
 #> 4          1    0.25          1    0.25
 
 trial_init() |>
-  trial_advance() |>
-  trial_advance() 
+  add_trials() |>
+  add_trials() 
 #> # A tibble: 8 × 6
 #>   t1_outcome t1_prob t2_outcome t2_prob t3_outcome t3_prob
 #>        <int>   <dbl>      <int>   <dbl>      <int>   <dbl>
@@ -117,8 +122,8 @@ trial_init() |>
 ``` r
 library(magrittr)
 trial_init(prob = .3) %>%
-  trial_advance() %>%
-  trial_advance() %>%
+  add_trials() %>%
+  add_trials() %>%
   .$out %>%
   sum_across() %>%
   prod_across()
@@ -139,29 +144,30 @@ trial_init(prob = .3) %>%
 ``` r
 library(magrittr)
 bernoulli_trial(prob = .5) %>%
+  trial_init() %>% 
   add_trials() %>%
   add_trials() %>%
   add_trials(5) %>%
   .$out %>%
   sum_across() %>%
   prod_across()
-#> # A tibble: 128 × 16
+#> # A tibble: 256 × 18
 #>    global_probs global…¹ t1_ou…² t1_prob t2_ou…³ t2_prob t3_ou…⁴ t3_prob t4_ou…⁵
 #>           <dbl>    <dbl>   <int>   <dbl>   <int>   <dbl>   <int>   <dbl>   <int>
-#>  1      0.00781        0       0     0.5       0     0.5       0     0.5       0
-#>  2      0.00781        1       0     0.5       0     0.5       0     0.5       0
-#>  3      0.00781        1       0     0.5       0     0.5       0     0.5       0
-#>  4      0.00781        2       0     0.5       0     0.5       0     0.5       0
-#>  5      0.00781        1       0     0.5       0     0.5       0     0.5       0
-#>  6      0.00781        2       0     0.5       0     0.5       0     0.5       0
-#>  7      0.00781        2       0     0.5       0     0.5       0     0.5       0
-#>  8      0.00781        3       0     0.5       0     0.5       0     0.5       0
-#>  9      0.00781        1       0     0.5       0     0.5       0     0.5       1
-#> 10      0.00781        2       0     0.5       0     0.5       0     0.5       1
-#> # … with 118 more rows, 7 more variables: t4_prob <dbl>, t5_outcome <int>,
+#>  1      0.00391        0       0     0.5       0     0.5       0     0.5       0
+#>  2      0.00391        1       0     0.5       0     0.5       0     0.5       0
+#>  3      0.00391        1       0     0.5       0     0.5       0     0.5       0
+#>  4      0.00391        2       0     0.5       0     0.5       0     0.5       0
+#>  5      0.00391        1       0     0.5       0     0.5       0     0.5       0
+#>  6      0.00391        2       0     0.5       0     0.5       0     0.5       0
+#>  7      0.00391        2       0     0.5       0     0.5       0     0.5       0
+#>  8      0.00391        3       0     0.5       0     0.5       0     0.5       0
+#>  9      0.00391        1       0     0.5       0     0.5       0     0.5       0
+#> 10      0.00391        2       0     0.5       0     0.5       0     0.5       0
+#> # … with 246 more rows, 9 more variables: t4_prob <dbl>, t5_outcome <int>,
 #> #   t5_prob <dbl>, t6_outcome <int>, t6_prob <dbl>, t7_outcome <int>,
-#> #   t7_prob <dbl>, and abbreviated variable names ¹​global_outcome, ²​t1_outcome,
-#> #   ³​t2_outcome, ⁴​t3_outcome, ⁵​t4_outcome
+#> #   t7_prob <dbl>, t8_outcome <int>, t8_prob <dbl>, and abbreviated variable
+#> #   names ¹​global_outcome, ²​t1_outcome, ³​t2_outcome, ⁴​t3_outcome, ⁵​t4_outcome
 ```
 
 # Further summary based on outcome of interest…
@@ -177,9 +183,10 @@ library(dplyr)
 #> 
 #>     intersect, setdiff, setequal, union
 bernoulli_trial(prob = .5) %>%
+  add_trials() %>% 
   add_trials() %>%
   add_trials() %>%
-  add_trials(5) %>%
+  add_trials(3) %>%
   .$out %>%
   sum_across() %>%
   prod_across() %>%
@@ -242,7 +249,7 @@ crossing(trial = 1:1000,
 #> # A tibble: 1 × 2
 #>   first_hh first_ht
 #>      <dbl>    <dbl>
-#> 1     6.10     3.97
+#> 1     6.02     4.04
 ```
 
 It’s about the second chances…
@@ -251,12 +258,12 @@ It’s about the second chances…
 options(pillar.print_max = Inf)
 fair_coin(outcome_set = c("T", "H")) %>% 
   select(-prob) %>% 
+  trial_init() %>% 
   add_trials() %>% 
   add_trials() %>% 
   add_trials() %>%
   add_trials() %>%
   add_trials() %>%
-  add_trials() %>% 
   .$out %>% 
   mutate(history = row_number()) %>% 
   pivot_longer(-history) %>% 
