@@ -162,6 +162,8 @@ Trials <- R6::R6Class("Trials",
                     trial = NULL,
                     index = NULL,
                     out = NULL,
+                    out_ts = NULL,
+                    as_ts = FALSE,
 
 
                     # functions
@@ -170,7 +172,10 @@ Trials <- R6::R6Class("Trials",
                       self$trial <- trial
                       self$index <- 1
 
-                      self$out <- cross_trials(self$trial, num_trials = self$index)
+                      self$out <- cross_trials(self$trial,
+                                               num_trials = self$index) |>
+                        dplyr::mutate(history = dplyr::row_number()) |>
+                        dplyr::select(.data$history, dplyr::everything())
 
                       invisible(self)          #returns
 
@@ -181,16 +186,39 @@ Trials <- R6::R6Class("Trials",
 
                       self$index <- self$index + increment
 
+
                       # displaying
-                      self$out <- cross_trials(self$trial, num_trials = self$index)
+                      self$out <- cross_trials(self$trial, num_trials = self$index)  |>
+                        dplyr::mutate(history = dplyr::row_number()) |>
+                        dplyr::select(.data$history, dplyr::everything())
 
                       invisible(self)          #returns
 
                     },
 
+                    to_time_series = function(as_ts = FALSE){
+
+                      self$as_ts <- as_ts
+
+                    },
+
                     print = function() {  # print method; default is to print everything
 
-                      print(self$out)
+                      if(self$as_ts){
+
+                            print(
+
+                            self$out |>
+                              tidyr::pivot_longer (
+                                cols = -history, names_sep = "_",
+                                names_to = c("trial","name")
+                                   ) |>
+                              tidyr::pivot_wider(names_from = .data$name,
+                                                 values_from = .data$value)
+
+                            )
+
+                        }else{print(self$out)}
 
                     }
                   )
@@ -213,8 +241,11 @@ Trials <- R6::R6Class("Trials",
 #' bernoulli_trial() |>
 #' trial_init()
 #'
-#' trial_init()
-trial_init <- function(trial = NULL, prob = .25){
+#' bernoulli_trial() |>
+#' trial_init(as_ts = TRUE)
+#'
+#' trial_init() -> hi
+trial_init <- function(trial = NULL, prob = .25, as_ts = FALSE){
 
   if(is.null(trial)){trial = bernoulli_trial(prob = prob)}
 
@@ -222,6 +253,8 @@ trial_init <- function(trial = NULL, prob = .25){
 
 
   my_trials$init(trial = trial)
+
+  my_trials$to_time_series(as_ts = as_ts)
 
   my_trials
 
@@ -237,6 +270,7 @@ trial_init <- function(trial = NULL, prob = .25){
 #' @export
 #'
 #' @examples
+#' library(tidyverse)
 #' bernoulli_trial() |>
 #' trial_init() |>
 #'   trial_advance()
@@ -245,21 +279,70 @@ trial_init <- function(trial = NULL, prob = .25){
 #' trial_init() |>
 #'   trial_advance(2)
 #'
+#'bernoulli_trial() |>
+#' trial_init() |>
+#'   trial_advance(2, as_ts = TRUE)
+
+#'
 #' bernoulli_trial() |>
 #' trial_init() |>
 #'   trial_advance() |>
 #'   trial_advance()
 #'
-trial_advance <- function(trials, increment = 1){
+trial_advance <- function(trials, increment = 1, as_ts = FALSE){
 
   my_trials <- trials
 
   my_trials$update(increment = increment)
+  my_trials$to_time_series(as_ts = as_ts)
 
   my_trials
 
 }
 
+
+#' Title
+#'
+#' @param trials
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' library(tidyverse)
+#' bernoulli_trial() |>
+#'   add_trials() |>
+#'   to_tsibble()
+#'
+#' bernoulli_trial(prob = .5) |>
+#'   add_trials() |>
+#'   add_trials() |>
+#'   to_tsibble()  |>
+#'   group_by(history)  |>
+#'   summarize(hist_prob = prod(prob),
+#'             count_successes = sum(outcome),
+#'             paths = paste(outcome, collapse = ",")) |>
+#'   arrange(count_successes) |>
+#'   group_by(count_successes) |>
+#'   summarize(count_prob = sum(hist_prob))
+#'
+to_tsibble <- function(trials){
+
+  my_trials <- trials
+
+  my_trials$update(increment = 0)
+
+  my_trials$to_time_series(as_ts = TRUE)
+
+  my_trials$out |>
+    tidyr::pivot_longer(
+      cols = -.data$history, names_sep = "_",
+      names_to = c("trial","name")
+    ) |>
+    tidyr::pivot_wider(names_from = .data$name,
+                       values_from = .data$value)
+
+}
 
 
 #' Title
@@ -276,26 +359,33 @@ trial_advance <- function(trials, increment = 1){
 #'   add_trials() |>
 #'   add_trials()
 #'
-#'   bernoulli_trial() |>
+#'bernoulli_trial() |>
 #'   add_trials()
+#'
+#' bernoulli_trial() |>
+#'   add_trials() |>
+#'   add_trials(as_ts = TRUE)
 #'
 #'  fair_coin() |>
 #'   add_trials(2)
-add_trials <- function(trials, increment = 1){
+add_trials <- function(trials, increment = 1, as_ts = FALSE){
 
   if(!R6::is.R6(trials)){
 
-    my_trials <- trial_init(trial = trials)
+    my_trials <- trial_init(trial = trials,
+                            as_ts = as_ts)
 
     my_trials <- trial_advance(trials = my_trials,
-                              increment = increment)
+                              increment = increment,
+                              as_ts = as_ts)
 
   }
 
   if(R6::is.R6(trials)){
 
     my_trials <- trial_advance(trials = trials,
-                               increment = increment)
+                               increment = increment,
+                               as_ts = as_ts)
 
     }
 

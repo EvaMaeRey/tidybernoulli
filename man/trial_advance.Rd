@@ -4,7 +4,7 @@
 \alias{trial_advance}
 \title{Title}
 \usage{
-trial_advance(trials, increment = 1)
+trial_advance(trials, increment = 1, as_ts = FALSE)
 }
 \arguments{
 \item{increment}{}
@@ -13,6 +13,7 @@ trial_advance(trials, increment = 1)
 Title
 }
 \examples{
+library(tidyverse)
 bernoulli_trial() |>
 trial_init() |>
   trial_advance()
@@ -20,6 +21,10 @@ trial_init() |>
 bernoulli_trial() |>
 trial_init() |>
   trial_advance(2)
+
+bernoulli_trial() |>
+trial_init() |>
+  trial_advance(2, as_ts = TRUE)
 
 bernoulli_trial() |>
 trial_init() |>

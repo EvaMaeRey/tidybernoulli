@@ -4,7 +4,7 @@
 \alias{add_trials}
 \title{Title}
 \usage{
-add_trials(trials, increment = 1)
+add_trials(trials, increment = 1, as_ts = FALSE)
 }
 \arguments{
 \item{increment}{}
@@ -18,8 +18,12 @@ trial_init() |>
   add_trials() |>
   add_trials()
 
-  bernoulli_trial() |>
+bernoulli_trial() |>
   add_trials()
+
+bernoulli_trial() |>
+  add_trials() |>
+  add_trials(as_ts = TRUE)
 
  fair_coin() |>
   add_trials(2)

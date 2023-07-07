@@ -4,7 +4,7 @@
 \alias{trial_init}
 \title{Title}
 \usage{
-trial_init(trial = NULL, prob = 0.25)
+trial_init(trial = NULL, prob = 0.25, as_ts = FALSE)
 }
 \arguments{
 \item{trial}{}
@@ -16,5 +16,8 @@ Title
 bernoulli_trial() |>
 trial_init()
 
-trial_init()
+bernoulli_trial() |>
+trial_init(as_ts = TRUE)
+
+trial_init() -> hi
 }

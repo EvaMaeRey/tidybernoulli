@@ -132,6 +132,25 @@ dbinom(x =  0:7, size = 7, prob = .5)
 
 ---
 
+or...
+
+```{r}
+bernoulli_trial(prob = .5) |>
+  add_trials() |>
+  add_trials() |>
+  to_tsibble()  |>
+  group_by(history)  |>
+  summarize(hist_prob = prod(prob),
+            count_successes = sum(outcome),
+            paths = paste(outcome, collapse = ",")) |>
+  arrange(count_successes) |>
+  group_by(count_successes) |>
+  summarize(count_prob = sum(hist_prob))
+
+```
+
+---
+
 # drob quick job on veridical paradox
 
 > A #tidyverse simulation to demonstrate that if you wait for two heads in a row, it takes 6 flips on average, while you wait for a heads then a tails, it takes 4 flips on average
@@ -140,6 +159,7 @@ dbinom(x =  0:7, size = 7, prob = .5)
 ```{r}
 library(tidyverse)
 
+# drob
 crossing(trial = 1:1000,
          flip = 1:100) %>% 
   mutate(heads = rbinom(n(), 1, .5)) %>% 
@@ -166,21 +186,19 @@ fair_coin(outcome_set = c("T", "H")) %>%
   add_trials() %>%
   add_trials() %>%
   add_trials() %>%
-  .$out %>% 
-  mutate(history = row_number()) %>% 
-  pivot_longer(-history) %>% 
+  to_tsibble() %>% 
   group_by(history) %>% 
   ggplot() + 
-  aes(y = history, x = name) + 
+  aes(y = history, x = trial) + 
   geom_tile(color = "white") + 
-  aes(fill = value) ->
+  aes(fill = outcome) ->
 baseplot; baseplot
 
 baseplot + 
-  geom_point(data = . %>% filter( value == "H" & lag(value) == "H"), color = "darkred") 
+  geom_point(data = . %>% filter( outcome == "H" & lag(outcome) == "H"), color = "darkred") 
 
 baseplot + 
-  geom_point(data = . %>% filter( value == "T" & lag(value) == "H"), color = "darkred")
+  geom_point(data = . %>% filter( outcome == "T" & lag(outcome) == "H"), color = "darkred")
 ```
 
 # Peek into internals of tidybernoulli

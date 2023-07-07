@@ -93,28 +93,28 @@ bernoulli_trial()
 
 trial_init() |>
   add_trials()
-#> # A tibble: 4 × 4
-#>   t1_outcome t1_prob t2_outcome t2_prob
-#>        <int>   <dbl>      <int>   <dbl>
-#> 1          0    0.75          0    0.75
-#> 2          0    0.75          1    0.25
-#> 3          1    0.25          0    0.75
-#> 4          1    0.25          1    0.25
+#> # A tibble: 4 × 5
+#>   history t1_outcome t1_prob t2_outcome t2_prob
+#>     <int>      <int>   <dbl>      <int>   <dbl>
+#> 1       1          0    0.75          0    0.75
+#> 2       2          0    0.75          1    0.25
+#> 3       3          1    0.25          0    0.75
+#> 4       4          1    0.25          1    0.25
 
 trial_init() |>
   add_trials() |>
   add_trials() 
-#> # A tibble: 8 × 6
-#>   t1_outcome t1_prob t2_outcome t2_prob t3_outcome t3_prob
-#>        <int>   <dbl>      <int>   <dbl>      <int>   <dbl>
-#> 1          0    0.75          0    0.75          0    0.75
-#> 2          0    0.75          0    0.75          1    0.25
-#> 3          0    0.75          1    0.25          0    0.75
-#> 4          0    0.75          1    0.25          1    0.25
-#> 5          1    0.25          0    0.75          0    0.75
-#> 6          1    0.25          0    0.75          1    0.25
-#> 7          1    0.25          1    0.25          0    0.75
-#> 8          1    0.25          1    0.25          1    0.25
+#> # A tibble: 8 × 7
+#>   history t1_outcome t1_prob t2_outcome t2_prob t3_outcome t3_prob
+#>     <int>      <int>   <dbl>      <int>   <dbl>      <int>   <dbl>
+#> 1       1          0    0.75          0    0.75          0    0.75
+#> 2       2          0    0.75          0    0.75          1    0.25
+#> 3       3          0    0.75          1    0.25          0    0.75
+#> 4       4          0    0.75          1    0.25          1    0.25
+#> 5       5          1    0.25          0    0.75          0    0.75
+#> 6       6          1    0.25          0    0.75          1    0.25
+#> 7       7          1    0.25          1    0.25          0    0.75
+#> 8       8          1    0.25          1    0.25          1    0.25
 ```
 
 # Summarizing possible outcome histories
@@ -127,18 +127,19 @@ trial_init(prob = .3) %>%
   .$out %>%
   sum_across() %>%
   prod_across()
-#> # A tibble: 8 × 8
-#>   global_probs global_outcome t1_outcome t1_prob t2_ou…¹ t2_prob t3_ou…² t3_prob
-#>          <dbl>          <dbl>      <int>   <dbl>   <int>   <dbl>   <int>   <dbl>
-#> 1        0.343              0          0     0.7       0     0.7       0     0.7
-#> 2        0.147              1          0     0.7       0     0.7       1     0.3
-#> 3        0.147              1          0     0.7       1     0.3       0     0.7
-#> 4        0.063              2          0     0.7       1     0.3       1     0.3
-#> 5        0.147              1          1     0.3       0     0.7       0     0.7
-#> 6        0.063              2          1     0.3       0     0.7       1     0.3
-#> 7        0.063              2          1     0.3       1     0.3       0     0.7
-#> 8        0.027              3          1     0.3       1     0.3       1     0.3
-#> # … with abbreviated variable names ¹​t2_outcome, ²​t3_outcome
+#> # A tibble: 8 × 9
+#>   global_probs global_…¹ history t1_ou…² t1_prob t2_ou…³ t2_prob t3_ou…⁴ t3_prob
+#>          <dbl>     <dbl>   <int>   <int>   <dbl>   <int>   <dbl>   <int>   <dbl>
+#> 1        0.343         0       1       0     0.7       0     0.7       0     0.7
+#> 2        0.147         1       2       0     0.7       0     0.7       1     0.3
+#> 3        0.147         1       3       0     0.7       1     0.3       0     0.7
+#> 4        0.063         2       4       0     0.7       1     0.3       1     0.3
+#> 5        0.147         1       5       1     0.3       0     0.7       0     0.7
+#> 6        0.063         2       6       1     0.3       0     0.7       1     0.3
+#> 7        0.063         2       7       1     0.3       1     0.3       0     0.7
+#> 8        0.027         3       8       1     0.3       1     0.3       1     0.3
+#> # … with abbreviated variable names ¹​global_outcome, ²​t1_outcome, ³​t2_outcome,
+#> #   ⁴​t3_outcome
 ```
 
 ``` r
@@ -151,23 +152,24 @@ bernoulli_trial(prob = .5) %>%
   .$out %>%
   sum_across() %>%
   prod_across()
-#> # A tibble: 256 × 18
-#>    global_probs global…¹ t1_ou…² t1_prob t2_ou…³ t2_prob t3_ou…⁴ t3_prob t4_ou…⁵
-#>           <dbl>    <dbl>   <int>   <dbl>   <int>   <dbl>   <int>   <dbl>   <int>
-#>  1      0.00391        0       0     0.5       0     0.5       0     0.5       0
-#>  2      0.00391        1       0     0.5       0     0.5       0     0.5       0
-#>  3      0.00391        1       0     0.5       0     0.5       0     0.5       0
-#>  4      0.00391        2       0     0.5       0     0.5       0     0.5       0
-#>  5      0.00391        1       0     0.5       0     0.5       0     0.5       0
-#>  6      0.00391        2       0     0.5       0     0.5       0     0.5       0
-#>  7      0.00391        2       0     0.5       0     0.5       0     0.5       0
-#>  8      0.00391        3       0     0.5       0     0.5       0     0.5       0
-#>  9      0.00391        1       0     0.5       0     0.5       0     0.5       0
-#> 10      0.00391        2       0     0.5       0     0.5       0     0.5       0
-#> # … with 246 more rows, 9 more variables: t4_prob <dbl>, t5_outcome <int>,
-#> #   t5_prob <dbl>, t6_outcome <int>, t6_prob <dbl>, t7_outcome <int>,
-#> #   t7_prob <dbl>, t8_outcome <int>, t8_prob <dbl>, and abbreviated variable
-#> #   names ¹​global_outcome, ²​t1_outcome, ³​t2_outcome, ⁴​t3_outcome, ⁵​t4_outcome
+#> # A tibble: 256 × 19
+#>    global_probs global…¹ history t1_ou…² t1_prob t2_ou…³ t2_prob t3_ou…⁴ t3_prob
+#>           <dbl>    <dbl>   <int>   <int>   <dbl>   <int>   <dbl>   <int>   <dbl>
+#>  1      0.00391        0       1       0     0.5       0     0.5       0     0.5
+#>  2      0.00391        1       2       0     0.5       0     0.5       0     0.5
+#>  3      0.00391        1       3       0     0.5       0     0.5       0     0.5
+#>  4      0.00391        2       4       0     0.5       0     0.5       0     0.5
+#>  5      0.00391        1       5       0     0.5       0     0.5       0     0.5
+#>  6      0.00391        2       6       0     0.5       0     0.5       0     0.5
+#>  7      0.00391        2       7       0     0.5       0     0.5       0     0.5
+#>  8      0.00391        3       8       0     0.5       0     0.5       0     0.5
+#>  9      0.00391        1       9       0     0.5       0     0.5       0     0.5
+#> 10      0.00391        2      10       0     0.5       0     0.5       0     0.5
+#> # … with 246 more rows, 10 more variables: t4_outcome <int>, t4_prob <dbl>,
+#> #   t5_outcome <int>, t5_prob <dbl>, t6_outcome <int>, t6_prob <dbl>,
+#> #   t7_outcome <int>, t7_prob <dbl>, t8_outcome <int>, t8_prob <dbl>, and
+#> #   abbreviated variable names ¹​global_outcome, ²​t1_outcome, ³​t2_outcome,
+#> #   ⁴​t3_outcome
 ```
 
 # Further summary based on outcome of interest…
@@ -215,6 +217,31 @@ dbinom(x =  0:7, size = 7, prob = .5)
 
 -----
 
+or…
+
+``` r
+bernoulli_trial(prob = .5) |>
+  add_trials() |>
+  add_trials() |>
+  to_tsibble()  |>
+  group_by(history)  |>
+  summarize(hist_prob = prod(prob),
+            count_successes = sum(outcome),
+            paths = paste(outcome, collapse = ",")) |>
+  arrange(count_successes) |>
+  group_by(count_successes) |>
+  summarize(count_prob = sum(hist_prob))
+#> # A tibble: 4 × 2
+#>   count_successes count_prob
+#>             <dbl>      <dbl>
+#> 1               0      0.125
+#> 2               1      0.375
+#> 3               2      0.375
+#> 4               3      0.125
+```
+
+-----
+
 # drob quick job on veridical paradox
 
 > A \#tidyverse simulation to demonstrate that if you wait for two heads
@@ -235,6 +262,7 @@ library(tidyverse)
 #> ✖ purrr::set_names() masks magrittr::set_names()
 #> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 
+# drob
 crossing(trial = 1:1000,
          flip = 1:100) %>% 
   mutate(heads = rbinom(n(), 1, .5)) %>% 
@@ -249,7 +277,7 @@ crossing(trial = 1:1000,
 #> # A tibble: 1 × 2
 #>   first_hh first_ht
 #>      <dbl>    <dbl>
-#> 1     6.02     4.04
+#> 1     6.06     3.97
 ```
 
 It’s about the second chances…
@@ -264,88 +292,86 @@ fair_coin(outcome_set = c("T", "H")) %>%
   add_trials() %>%
   add_trials() %>%
   add_trials() %>%
-  .$out %>% 
-  mutate(history = row_number()) %>% 
-  pivot_longer(-history) %>% 
+  to_tsibble() %>% 
   group_by(history) %>% 
   ggplot() + 
-  aes(y = history, x = name) + 
+  aes(y = history, x = trial) + 
   geom_tile(color = "white") + 
-  aes(fill = value) ->
+  aes(fill = outcome) ->
 baseplot; baseplot
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
 ``` r
 
 baseplot + 
-  geom_point(data = . %>% filter( value == "H" & lag(value) == "H"), color = "darkred") 
+  geom_point(data = . %>% filter( outcome == "H" & lag(outcome) == "H"), color = "darkred") 
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-2.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-11-2.png" width="100%" />
 
 ``` r
 
 baseplot + 
-  geom_point(data = . %>% filter( value == "T" & lag(value) == "H"), color = "darkred")
+  geom_point(data = . %>% filter( outcome == "T" & lag(outcome) == "H"), color = "darkred")
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-3.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-11-3.png" width="100%" />
 
 # Peek into internals of tidybernoulli
 
 ``` r
 readLines("R/bernoulli-trial.R")[150:200]
-#>  [1] "#"                                                                                       
-#>  [2] "# my_trials"                                                                             
-#>  [3] "#"                                                                                       
-#>  [4] "# my_trials$init(trial = bernoulli_trial())"                                             
-#>  [5] "# my_trials$out"                                                                         
-#>  [6] "# my_trials$update()"                                                                    
-#>  [7] "# my_trials$out"                                                                         
-#>  [8] ""                                                                                        
-#>  [9] "Trials <- R6::R6Class(\"Trials\","                                                       
-#> [10] "                  public = list("                                                        
-#> [11] ""                                                                                        
-#> [12] "                    # objects"                                                           
-#> [13] "                    trial = NULL,"                                                       
-#> [14] "                    index = NULL,"                                                       
-#> [15] "                    out = NULL,"                                                         
-#> [16] ""                                                                                        
-#> [17] ""                                                                                        
-#> [18] "                    # functions"                                                         
-#> [19] "                    init = function(trial = NULL){"                                      
-#> [20] ""                                                                                        
-#> [21] "                      self$trial <- trial"                                               
-#> [22] "                      self$index <- 1"                                                   
-#> [23] ""                                                                                        
-#> [24] "                      self$out <- cross_trials(self$trial, num_trials = self$index)"     
-#> [25] ""                                                                                        
-#> [26] "                      invisible(self)          #returns"                                 
-#> [27] ""                                                                                        
-#> [28] ""                                                                                        
-#> [29] "                    },"                                                                  
-#> [30] ""                                                                                        
-#> [31] "                    update = function(increment = 1){ # a method"                        
-#> [32] ""                                                                                        
-#> [33] "                      self$index <- self$index + increment"                              
-#> [34] ""                                                                                        
-#> [35] "                      # displaying"                                                      
-#> [36] "                      self$out <- cross_trials(self$trial, num_trials = self$index)"     
-#> [37] ""                                                                                        
-#> [38] "                      invisible(self)          #returns"                                 
-#> [39] ""                                                                                        
-#> [40] "                    },"                                                                  
-#> [41] ""                                                                                        
-#> [42] "                    print = function() {  # print method; default is to print everything"
-#> [43] ""                                                                                        
-#> [44] "                      print(self$out)"                                                   
-#> [45] ""                                                                                        
-#> [46] "                    }"                                                                   
-#> [47] "                  )"                                                                     
-#> [48] ")"                                                                                       
-#> [49] ""                                                                                        
-#> [50] ""                                                                                        
+#>  [1] "#"                                                                                      
+#>  [2] "# my_trials"                                                                            
+#>  [3] "#"                                                                                      
+#>  [4] "# my_trials$init(trial = bernoulli_trial())"                                            
+#>  [5] "# my_trials$out"                                                                        
+#>  [6] "# my_trials$update()"                                                                   
+#>  [7] "# my_trials$out"                                                                        
+#>  [8] ""                                                                                       
+#>  [9] "Trials <- R6::R6Class(\"Trials\","                                                      
+#> [10] "                  public = list("                                                       
+#> [11] ""                                                                                       
+#> [12] "                    # objects"                                                          
+#> [13] "                    trial = NULL,"                                                      
+#> [14] "                    index = NULL,"                                                      
+#> [15] "                    out = NULL,"                                                        
+#> [16] "                    out_ts = NULL,"                                                     
+#> [17] "                    as_ts = FALSE,"                                                     
+#> [18] ""                                                                                       
+#> [19] ""                                                                                       
+#> [20] "                    # functions"                                                        
+#> [21] "                    init = function(trial = NULL){"                                     
+#> [22] ""                                                                                       
+#> [23] "                      self$trial <- trial"                                              
+#> [24] "                      self$index <- 1"                                                  
+#> [25] ""                                                                                       
+#> [26] "                      self$out <- cross_trials(self$trial,"                             
+#> [27] "                                               num_trials = self$index) |>"             
+#> [28] "                        dplyr::mutate(history = dplyr::row_number()) |>"                
+#> [29] "                        dplyr::select(.data$history, dplyr::everything())"              
+#> [30] ""                                                                                       
+#> [31] "                      invisible(self)          #returns"                                
+#> [32] ""                                                                                       
+#> [33] ""                                                                                       
+#> [34] "                    },"                                                                 
+#> [35] ""                                                                                       
+#> [36] "                    update = function(increment = 1){ # a method"                       
+#> [37] ""                                                                                       
+#> [38] "                      self$index <- self$index + increment"                             
+#> [39] ""                                                                                       
+#> [40] ""                                                                                       
+#> [41] "                      # displaying"                                                     
+#> [42] "                      self$out <- cross_trials(self$trial, num_trials = self$index)  |>"
+#> [43] "                        dplyr::mutate(history = dplyr::row_number()) |>"                
+#> [44] "                        dplyr::select(.data$history, dplyr::everything())"              
+#> [45] ""                                                                                       
+#> [46] "                      invisible(self)          #returns"                                
+#> [47] ""                                                                                       
+#> [48] "                    },"                                                                 
+#> [49] ""                                                                                       
+#> [50] "                    to_time_series = function(as_ts = FALSE){"                          
 #> [51] ""
 ```
