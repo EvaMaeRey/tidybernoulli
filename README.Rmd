@@ -26,7 +26,7 @@ Instead of looking at the realization of single trials and trials histories, we 
 
 Once all the outcome-probability pathways have been built up, summary functions allow us to ask questions about global outcomes; e.g. how likely are we to observe at least one success in 5 fair coin flips. Students will be able to see distributions like the binomial distribution emerge from first principles.  
 
-tidybernoulli was inspired and is complementary to [ma206distributions](https://evamaerey.github.io/ma206distributions/) which treats common discrete probability distributions consistent with data requirements for use in with ggplot2 and the rest of the tidyverse.
+tidybernoulli was inspired by and is complementary to [ma206distributions](https://evamaerey.github.io/ma206distributions/) which treats common discrete probability distributions consistent with data requirements for use in with ggplot2 and the rest of the tidyverse.
 
 ## Installation
 
@@ -200,6 +200,80 @@ baseplot +
 baseplot + 
   geom_point(data = . %>% filter( outcome == "T" & lag(outcome) == "H"), color = "darkred")
 ```
+
+## 16 dolphin trials
+
+```{r}
+bernoulli_trial(prob = .5) |>
+  add_trials() |>
+  add_trials() |>
+  to_tsibble()  |>
+  group_by(history)  |>
+  summarize(hist_prob = prod(prob),
+            count_successes = sum(outcome),
+            paths = paste(outcome, collapse = ",")) |>
+  arrange(count_successes) |>
+  group_by(count_successes) |>
+  summarize(prob = sum(hist_prob))
+
+options(scipen = 10)
+bernoulli_trial(prob = .5) |>
+  add_trials(15) |>
+  to_tsibble()  |>
+  group_by(history)  |>
+  summarize(hist_prob = prod(prob),
+            count_successes = sum(outcome),
+            paths = paste(outcome, collapse = ",")) |>
+  arrange(count_successes) |>
+  group_by(count_successes) |>
+  summarize(prob = sum(hist_prob))
+
+
+collapse <- function(x, collapse = ", "){
+  paste(x, collapse = collapse)
+}
+
+bernoulli_trial(prob = .5, outcome_set = c("nope", "fish")) |>
+  add_trials(15) |>
+  to_tsibble() %>% 
+  group_by(history) %>% 
+  summarise(history = collapse(outcome),
+            sum_successes = sum(outcome == "fish"),
+            prob = prod(prob)) %>% 
+  group_by(sum_successes) %>% 
+  summarise(prob = sum(prob))
+```
+
+## Generalizing and simplifying to binomial equation...
+
+```{r}
+ma206equations::typeset_eq_binomial()
+ma206equations::typeset_eq_choose()
+```
+
+
+${{_N}C{_k}} \cdot p^kq^{N-k}$
+
+where
+
+$C = n!\(r!*(n-r)!)$
+
+
+## Quick viz...
+
+
+```{r}
+ma206distributions::tidy_dbinom(num_trials = 16, single_trial_prob = .5) %>% 
+  ggplot() + 
+  aes(x = num_successes,
+      y = probability) + 
+  ma206distributions::geom_lollipop(annotate = TRUE) + 
+  labs(title = "prob distributions of successes if random") + 
+  ma206equations::stamp_eq_binomial(x = 3, y = .1, size = 8)
+```
+
+
+
 
 # Peek into internals of tidybernoulli
 

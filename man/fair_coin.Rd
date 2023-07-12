@@ -4,7 +4,7 @@
 \alias{fair_coin}
 \title{Title}
 \usage{
-fair_coin(outcome_type = "char", outcome_set = c("tails", "heads"))
+fair_coin(outcome_set = c("tails", "heads"))
 }
 \arguments{
 \item{prob}{probability of success, default is .25}
@@ -17,7 +17,7 @@ Title
 }
 \examples{
 fair_coin()
-fair_coin(outcome_type = "num")
-fair_coin(outcome_type = "logical")
+fair_coin(outcome_set = 0:1)
+fair_coin(outcome_set = c(FALSE, TRUE))
 fair_coin(outcome_set = c("fish", "no fish"))
 }

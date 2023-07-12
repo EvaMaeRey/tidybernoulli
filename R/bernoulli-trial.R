@@ -1,6 +1,7 @@
 #' Title
 #'
-#' @param prob probability of success, default is .25
+#' @param prob probability of 'success', default is .25
+#' @param outcome_set set of two outcomes where second is considered a 'success'
 #'
 #' @return probability and outcome as 0 and 1
 #' @export
@@ -8,21 +9,9 @@
 #' @examples
 #' bernoulli_trial(.5)
 #' bernoulli_trial(.6)
-bernoulli_trial <- function(outcome_type = "num", outcome_set = c(0, 1), prob = .25){
+bernoulli_trial <- function(outcome_set = c(0, 1), prob = .25){
 
-  if(outcome_type == "char"){
-    data <- data.frame(outcome = outcome_set, prob = c(1-prob, prob))
-  }
-
-  if(outcome_type == "num"){
-    data <- data.frame(outcome = 0:1, prob = c(1-prob, prob))
-  }
-
-  if(outcome_type == "logical"){
-    data <- data.frame(outcome = c(FALSE, TRUE), prob = c(1-prob, prob))
-  }
-
-  data
+  data.frame(outcome = outcome_set, prob = c(1-prob, prob))
 
 }
 
@@ -45,12 +34,12 @@ bernoulli_trial <- function(outcome_type = "num", outcome_set = c(0, 1), prob = 
 #' @examples
 #' weighted_coin()
 #' weighted_coin(prob = .55)
-#' weighted_coin(outcome_type = "num")
-#' weighted_coin(outcome_type = "logical")
+#' weighted_coin(outcome_set = 0:1)
+#' weighted_coin(outcome_set = c(FALSE, TRUE))
 #' weighted_coin(outcome_set = c("fish", "no fish"))
-weighted_coin <- function(prob = .75, outcome_type = "char", outcome_set = c("tails","heads")){
+weighted_coin <- function(prob = .75, outcome_set = c("tails","heads")){
 
-  bernoulli_trial(outcome_type = outcome_type, outcome_set = outcome_set, prob = prob)
+  bernoulli_trial(outcome_set = outcome_set, prob = prob)
 
 }
 
@@ -64,13 +53,13 @@ weighted_coin <- function(prob = .75, outcome_type = "char", outcome_set = c("ta
 #'
 #' @examples
 #' fair_coin()
-#' fair_coin(outcome_type = "num")
-#' fair_coin(outcome_type = "logical")
+#' fair_coin(outcome_set = 0:1)
+#' fair_coin(outcome_set = c(FALSE, TRUE))
 #' fair_coin(outcome_set = c("fish", "no fish"))
-fair_coin <- function(outcome_type = "char", outcome_set = c("tails","heads")){
+fair_coin <- function(outcome_set = c("tails","heads")){
 
   # same as weighted but only prob point five allowed
-  bernoulli_trial(outcome_type = outcome_type, outcome_set = outcome_set, prob = .5)
+  bernoulli_trial(outcome_set = outcome_set, prob = .5)
 
 }
 
@@ -185,7 +174,6 @@ Trials <- R6::R6Class("Trials",
                     update = function(increment = 1){ # a method
 
                       self$index <- self$index + increment
-
 
                       # displaying
                       self$out <- cross_trials(self$trial, num_trials = self$index)  |>
@@ -324,7 +312,7 @@ trial_advance <- function(trials, increment = 1, as_ts = FALSE){
 #'             paths = paste(outcome, collapse = ",")) |>
 #'   arrange(count_successes) |>
 #'   group_by(count_successes) |>
-#'   summarize(count_prob = sum(hist_prob))
+#'   summarize(prob = sum(hist_prob))
 #'
 to_tsibble <- function(trials){
 
@@ -335,12 +323,9 @@ to_tsibble <- function(trials){
   my_trials$to_time_series(as_ts = TRUE)
 
   my_trials$out |>
-    tidyr::pivot_longer(
-      cols = -.data$history, names_sep = "_",
-      names_to = c("trial","name")
-    ) |>
-    tidyr::pivot_wider(names_from = .data$name,
-                       values_from = .data$value)
+    tidyr::pivot_longer(-history,
+                 names_to = c("trial",".value"),
+                 names_pattern = "(.+)_(.+)")
 
 }
 

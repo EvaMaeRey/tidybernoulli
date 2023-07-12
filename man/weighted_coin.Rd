@@ -4,11 +4,7 @@
 \alias{weighted_coin}
 \title{Title}
 \usage{
-weighted_coin(
-  prob = 0.75,
-  outcome_type = "char",
-  outcome_set = c("tails", "heads")
-)
+weighted_coin(prob = 0.75, outcome_set = c("tails", "heads"))
 }
 \arguments{
 \item{prob}{probability of success, default is .25}
@@ -22,7 +18,7 @@ Title
 \examples{
 weighted_coin()
 weighted_coin(prob = .55)
-weighted_coin(outcome_type = "num")
-weighted_coin(outcome_type = "logical")
+weighted_coin(outcome_set = 0:1)
+weighted_coin(outcome_set = c(FALSE, TRUE))
 weighted_coin(outcome_set = c("fish", "no fish"))
 }

@@ -28,6 +28,6 @@ bernoulli_trial(prob = .5) |>
             paths = paste(outcome, collapse = ",")) |>
   arrange(count_successes) |>
   group_by(count_successes) |>
-  summarize(count_prob = sum(hist_prob))
+  summarize(prob = sum(hist_prob))
 
 }

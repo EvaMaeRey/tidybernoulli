@@ -4,10 +4,12 @@
 \alias{bernoulli_trial}
 \title{Title}
 \usage{
-bernoulli_trial(outcome_type = "num", outcome_set = c(0, 1), prob = 0.25)
+bernoulli_trial(outcome_set = c(0, 1), prob = 0.25)
 }
 \arguments{
-\item{prob}{probability of success, default is .25}
+\item{outcome_set}{set of two outcomes where second is considered a 'success'}
+
+\item{prob}{probability of 'success', default is .25}
 }
 \value{
 probability and outcome as 0 and 1
