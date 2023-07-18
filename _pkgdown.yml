@@ -2,3 +2,7 @@ url: ~
 template:
   bootstrap: 5
 
+navbar:
+  type: "inverse"
+  logo: "github-icon.png"
+  logo_href: "https://github.com/EvaMaeRey/tidybernoulli"
